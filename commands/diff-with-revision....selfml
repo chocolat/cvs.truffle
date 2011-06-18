@@ -1,0 +1,50 @@
+(trigger
+    (key [[ctrl][shift]Z]))
+
+(name [Diff With Revision...])
+
+(input nothing)
+
+(output new-document)
+
+(save nothing)
+
+(script [require_cmd "${TM_CVS:=cvs}" "If you have installed cvs, then you need to either update your <tt>PATH</tt> or set the <tt>TM_CVS</tt> shell variable (e.g. in Preferences / Advanced)"
+
+cd "$TM_DIRECTORY"
+revs=$("$TM_CVS" log "$TM_FILENAME"|grep '^revision' \
+	2> >(CocoaDialog progressbar --indeterminate \
+		--title "Diff Revision…" \
+		--text "Retrieving List of Revisions…" \
+	))
+
+revs=$(echo $revs|sed 's/revision //g')
+
+revs=`osascript<<END
+	set AppleScript's text item delimiters to {" "}
+	tell app "SystemUIServer"
+		activate
+		set ourList to (every text item of "$revs")
+		if the count of items in ourList is 0 then
+			display dialog "No older revisions of file '$(basename "$TM_FILEPATH")' found" buttons ("OK")
+			set the result to false
+		else
+			choose from list ourList with prompt "Diff '$(basename "$TM_FILEPATH")' with older revision:"
+		end if
+	end tell
+END`
+
+# exit if user canceled
+if [[ $revs = "false" ]]; then
+	osascript -e 'tell app "TextMate" to activate' &>/dev/null &	exit_discard
+fi
+
+export REVS="$revs"
+ruby <<'END'
+
+ENV['CVS_PATH'] = ENV['TM_CVS']
+$LOAD_PATH << ENV['TM_BUNDLE_SUPPORT']
+require 'cvs_diff'
+
+CVS::diff_active_file(ENV['REVS'], "Diff With Revision...")
+END])

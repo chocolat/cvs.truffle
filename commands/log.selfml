@@ -1,0 +1,15 @@
+(trigger
+    (key [[ctrl][shift]Z]))
+
+(name Log)
+
+(input nothing)
+
+(output new-document)
+
+(save nothing)
+
+(script [require_cmd "${TM_CVS:=cvs}" "If you have installed cvs, then you need to either update your <tt>PATH</tt> or set the <tt>TM_CVS</tt> shell variable (e.g. in Preferences / Advanced)"
+
+cd "$TM_DIRECTORY" &&
+"$TM_CVS" log "$TM_FILENAME"])

@@ -1,0 +1,22 @@
+(trigger
+    (key [[ctrl][shift]Z]))
+
+(name Revert)
+
+(input nothing)
+
+(output tooltip)
+
+(save nothing)
+
+(script [require_cmd "${TM_CVS:=cvs}" "If you have installed cvs, then you need to either update your <tt>PATH</tt> or set the <tt>TM_CVS</tt> shell variable (e.g. in Preferences / Advanced)"
+
+rm "$TM_FILEPATH" &&
+cd "$TM_DIRECTORY" &&
+"$TM_CVS" update "$TM_FILENAME"
+
+# force TM to refresh the current file..
+osascript &>/dev/null \
+   -e 'tell application "Dock" to activate' \
+   -e 'tell application "TextMate" to activate' &
+])

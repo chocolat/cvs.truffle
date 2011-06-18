@@ -1,0 +1,26 @@
+(trigger
+    (key [[ctrl][shift]Z]))
+
+(name [Reset sticky tags])
+
+(input nothing)
+
+(output tooltip)
+
+(save nothing)
+
+(script [require_cmd "${TM_CVS:=cvs}" "If you have installed cvs, then you need to either update your <tt>PATH</tt> or set the <tt>TM_CVS</tt> shell variable (e.g. in Preferences / Advanced)"
+
+ruby <<'END'
+
+ENV['CVS_PATH'] = ENV['TM_CVS']
+$LOAD_PATH << ENV['TM_BUNDLE_SUPPORT']
+require 'versioned_file'
+
+file = CVS::VersionedFile.new(ENV['TM_FILEPATH'])
+file.update(:reset_tags => true)
+
+puts "All sticky tags reset"
+
+END
+])

@@ -1,0 +1,32 @@
+(trigger
+    (key [[ctrl][shift]Z]))
+
+(name [Merge from tag...])
+
+(input nothing)
+
+(output nothing)
+
+(save nothing)
+
+(script [require_cmd "${TM_CVS:=cvs}" "If you have installed cvs, then you need to either update your <tt>PATH</tt> or set the <tt>TM_CVS</tt> shell variable (e.g. in Preferences / Advanced)"
+
+ruby <<'END'
+
+ENV['CVS_PATH'] = ENV['TM_CVS']
+$LOAD_PATH << ENV['TM_BUNDLE_SUPPORT']
+require 'versioned_file'
+
+tag=`CocoaDialog inputbox --title Merge --informative-text 'Which tag?' --button1 Update --button2 'Cancel'`
+
+accept, tag = *tag.to_a.map {|l| l.chomp}
+
+exit unless accept =~ /1/
+
+file = CVS::VersionedFile.new(ENV['TM_FILEPATH'])
+file.update(:tag => tag, :sticky => false)
+
+puts "Merged #{file.basename} from #{tag}."
+
+END
+])
