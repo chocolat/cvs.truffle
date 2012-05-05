@@ -1,6 +1,3 @@
-(menu command.check-out-revision...
-    command.commit...
-    (submenu Diff [command.diff-with-newest-(head)] [command.diff-with-working-copy-(base)] [command.diff-with-previous-revision-(prev)] command.diff-with-revision...)
-    (submenu History command.annotate command.annotate-line command.log)
-    (submenu Tags command.merge-from-tag... command.update-with-tag... command.reset-sticky-tags)
+(menu
+    (submenu History command.annotate command.log)
     command.revert)
